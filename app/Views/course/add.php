@@ -1,0 +1,49 @@
+<?= $this->extend('layouts/main') ?>
+
+<?= $this->section('content') ?>
+<?php if (isset($errors)): ?>
+    <div class="alert alert-danger">
+        <ul>
+            <?php foreach ($errors as $error): ?>
+                <li style="color: red;"><?= esc($error) ?></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+<?php endif; ?>
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Add Course</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" action="<?= site_url('/academics/courses') ?>">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" id="name" name="name" class="form-control" placeholder="Enter Name">
+                </div>
+
+                <div class="mb-3">
+                    <label for="code" class="form-label">Course Code</label>
+                    <input type="text" id="code" name="code" class="form-control" placeholder="Enter Course Code">
+                </div>
+
+                <div class="mb-3">
+                    <label for="credits" class="form-label">Credits</label>
+                    <input type="number" id="credits" name="credits" class="form-control" placeholder="Enter Credits">
+                </div>
+
+                <div class="mb-3">
+                    <label for="semester" class="form-label">Semester</label>
+                    <input type="number" id="semester" name="semester" class="form-control" placeholder="Enter Semester">
+                </div>
+
+                <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-success w-50">
+                        Add Course
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<?= $this->endSection() ?>
