@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use App\Libraries\DataParamsStudent;
 use App\Models\StudentModel;
 
 class StudentController extends BaseController
@@ -19,8 +20,35 @@ class StudentController extends BaseController
     public function index()
     {
         $parser = \Config\Services::parser();
+
+        $params = new DataParamsStudent([
+            'search' => $this->request->getGet('search'),
+            'academic_status' => $this->request->getGet('academic_status'),
+            'entry_year' => $this->request->getGet('entry_year'),
+            'study_program' => $this->request->getGet('study_program'),
+            'sort' => $this->request->getGet('sort'),
+            'order' => $this->request->getGet('order'),
+            'page_students' => $this->request->getGet('page_students'),
+            'perPage' => $this->request->getGet('perPage')
+        ]);
+
+
+        $result = $this->studentModel->getFilteredStudents($params);
+
+
+        $data = [
+            'students' => $result['students'],
+            'total' => $result['total'],
+            'academic_statuses' => $this->studentModel->getAllAcademicStatuses(),
+            'entry_years' => $this->studentModel->getAllEntryYears(),
+            'study_programs' => $this->studentModel->getAllStudyPrograms(),
+            'baseUrl' => base_url('/students'),
+            'student_id_th' => view_cell('SortTableHeaderCell', ['params' => $params, 'baseUrl' => base_url('/students'), 'tableField' => 'student_id', 'tableTitleHeader' => 'Student Id']),
+            'current_semester_th' => view_cell('SortTableHeaderCell', ['params' => $params, 'baseUrl' => base_url('/students'), 'tableField' => 'current_semester', 'tableTitleHeader' => 'Current Semester'])
+        ];
+
         // get all student data
-        $data['students'] = $this->studentModel->findAll();
+        // $data['students'] = $this->studentModel->findAll();
 
         // render delete and edit button using view cell
         $data['students'] = array_map(function ($student) {
@@ -31,11 +59,15 @@ class StudentController extends BaseController
 
         $data['siteUrl'] = site_url('students/new');
         $data['content'] = $parser->setData($data)->render('components/students_list');
+        $data['pager'] = $result['pager'];
+        $data['params'] = $params;
         $this->renderer->setData($data);
-        $cacheKey = 'view_' . str_replace('/', '_', $this->request->getUri()->getPath());
-        return cache()->remember($cacheKey, 1800, function () {
-            return $this->renderer->render('students/index');
-        });
+        // $cacheKey = 'view_' . str_replace('/', '_', $this->request->getUri()->getPath());
+        // return cache()->remember($cacheKey, 1800, function () {
+        //     return $this->renderer->render('students/index');
+        // });
+
+        return $this->renderer->render('students/index');
     }
 
     public function show($id)
@@ -115,12 +147,6 @@ class StudentController extends BaseController
             'academic_status' => $data['academicStatus'],
             'gpa' => $data['gpa'],
         ];
-
-        // validate if no update occurs
-
-        if (empty($data)) {
-            return redirect()->back()->with('error', 'No data provided for update');
-        }
 
         // find student data to update
         $student = $this->studentModel->find($id);

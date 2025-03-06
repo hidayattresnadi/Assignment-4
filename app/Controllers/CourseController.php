@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Libraries\DataParams;
 use App\Models\CourseModel;
 
 class CourseController extends BaseController
@@ -37,14 +38,43 @@ class CourseController extends BaseController
 
     public function showCourses()
     {
+        $params = new DataParams([
+            'search' => $this->request->getGet('search'),
+            'credits' => $this->request->getGet('credits'),
+            'semester' => $this->request->getGet('semester'),
+            'sort' => $this->request->getGet('sort'),
+            'order' => $this->request->getGet('order'),
+            'page_courses' => $this->request->getGet('page_courses'),
+            'perPage' => $this->request->getGet('perPage')
+        ]);
+
+
+        $result = $this->courseModel->getFilteredCourses($params);
+
+
+        $data = [
+            'title' => 'Manajemen Users',
+            'courses' => $result['courses'],
+            'pager' => $result['pager'],
+            'total' => $result['total'],
+            'params' => $params,
+            'credits' => $this->courseModel->getAllCredits(),
+            'semesters' => $this->courseModel->getAllSemesters(),
+            'baseUrl' => base_url('/academics/courses')
+        ];
+
+
         // get all student data
-        $data['courses'] = $this->courseModel->findAll();
-        $data['content'] = view_cell('ListCoursesCell', ['courses' => $data['courses']]);
+        // $data['courses'] = $this->courseModel->findAll();
+        // $data['courses'] = $this->courseModel->paginate(2, 'courses');
+        // $data['pager'] = $this->courseModel->pager;
+        $data['content'] = view_cell('ListCoursesCell', ['courses' => $data['courses'], 'params' => $data['params'], 'baseUrl' => $data['baseUrl']]);
         $this->renderer->setData($data);
-        $cacheKey = 'view_' . str_replace('/', '_', $this->request->getUri()->getPath());
-        return cache()->remember($cacheKey, 86400, function () {
-            return $this->renderer->render('academic/course_list');
-        });
+        // $cacheKey = 'view_' . str_replace('/', '_', $this->request->getUri()->getPath());
+        // return cache()->remember($cacheKey, 86400, function () {
+        //     return $this->renderer->render('course/course_list');
+        // });
+        return $this->renderer->render('course/course_list');
     }
 
     public function courseDetail($id)
@@ -88,9 +118,9 @@ class CourseController extends BaseController
 
         // validate data before insert data
         if (! $this->courseModel->validate($data)) {
-            return view('academics/courses/add', [
-                'errors' => $this->courseModel->errors(),
-            ]);
+            return redirect()->back()
+                ->with('errors', $this->courseModel->errors())
+                ->withInput();
         }
 
         // add data to table
@@ -109,11 +139,6 @@ class CourseController extends BaseController
     {
         // get data from form
         $data = $this->request->getPost();
-
-        // validate if no update occurs
-        if (empty($data)) {
-            return redirect()->back()->with('error', 'No data provided for update');
-        }
 
         // find course data to update
         $course = $this->courseModel->find($id);

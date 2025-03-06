@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Libraries\DataParams;
 use CodeIgniter\Model;
 
 class CourseModel extends Model
@@ -30,7 +31,8 @@ class CourseModel extends Model
     protected $validationRules      = [
         'code' => [
             'required',
-            'exact_length[8]',
+            'exact_length[5]',
+            'is_unique[courses.code]'
         ],
 
         'credits' => [
@@ -50,7 +52,8 @@ class CourseModel extends Model
     protected $validationMessages   = [
         'code' => [
             'required'     => 'Course code is required.',
-            'exact_length' => 'Course code must be exactly 8 characters long.',
+            'exact_length' => 'Course code must be exactly 5 characters long.',
+            'is_unique' => 'Course code is already registered.',
         ],
 
         'credits' => [
@@ -80,4 +83,53 @@ class CourseModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getFilteredCourses(DataParams $params)
+    {
+        if (!empty($params->search)) { // Apply search
+            $this->groupStart()
+                ->like('name', $params->search)
+                ->orLike('code', $params->search)
+                ->orlike("CAST(credits AS CHAR)", $params->search)
+                ->orlike("CAST(semester AS CHAR)", $params->search)
+                ->groupEnd();
+        }
+
+        // Apply filter credits
+
+        if (!empty($params->credits)) {
+            $this->where('credits', $params->credits);
+        }
+
+        // Apply filter semester
+
+        if (!empty($params->semester)) {
+            $this->where('semester', $params->semester);
+        }
+
+        // Apply sort
+        $allowedSortColumns = ['code', 'name'];
+        $sort = in_array($params->sort, $allowedSortColumns) ? $params->sort : 'id';
+        $order = ($params->order === 'desc') ? 'desc' : 'asc';
+
+        $this->orderBy($sort, $order);
+
+        $result = [
+            'courses' => $this->paginate($params->perPage, 'courses', $params->page_courses),
+            'pager' => $this->pager,
+            'total' => $this->countAllResults(false)
+        ];
+        return $result;
+    }
+
+    public function getAllCredits()
+    {
+        return [2, 3, 4];
+    }
+
+    public function getAllSemesters()
+    {
+        $semesters = $this->select('semester')->distinct()->findAll();
+        return array_column($semesters, 'semester');
+    }
 }

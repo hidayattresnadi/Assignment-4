@@ -1,9 +1,21 @@
-<div class="card-body">
+<div class="table-responsive">
     <table class="table table-bordered">
         <thead class="table-dark">
             <tr>
-                <th>Course Name</th>
-                <th>Course Code</th>
+                <th>
+                    <a href="<?= $params->getSortUrl('name', $baseUrl) ?>"
+                        class="text-white fw-bold text-decoration-none">
+                        Course Name
+                        <?= $params->isSortedBy('name') ? ($params->getSortDirection() == 'asc' ? '↑' : '↓') : '↓' ?>
+                    </a>
+                </th>
+                <th>
+                    <a href="<?= $params->getSortUrl('code', $baseUrl) ?>"
+                        class="text-white fw-bold text-decoration-none">
+                        Course Code
+                        <?= $params->isSortedBy('code') ? ($params->getSortDirection() == 'asc' ? '↑' : '↓') : '↓' ?>
+                    </a>
+                </th>
                 <th>Credits</th>
                 <th>Semester</th>
                 <th>Detail</th>
