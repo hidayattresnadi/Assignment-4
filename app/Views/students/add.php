@@ -16,7 +16,7 @@
             <h4 class="mb-0">Add Student</h4>
         </div>
         <div class="card-body">
-            <form id="formData" method="post" action="<?= site_url('/students') ?>">
+            <form id="formData" method="post" action="<?= site_url('admin/students/store') ?>">
 
                 <div class="mb-3">
                     <label for="name" class="form-label">Name</label>
@@ -32,6 +32,16 @@
                     <input type="text" id="studentId" name="studentId" class="form-control" placeholder="Enter Student Id"
                         data-pristine-required
                         data-pristine-required-message="Student Id required">
+                </div>
+
+                <div class="mb-3">
+                    <label for="user_id" class="form-label">Username</label>
+                    <select id="user_id" name="user_id" class="form-select" required>
+                        <option value="" disabled selected>-- Select Username --</option>
+                        <?php foreach ($users as $user): ?>
+                            <option value="<?= $user->id ?>"><?= ucfirst($user->username) ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
 
                 <div class="mb-3">

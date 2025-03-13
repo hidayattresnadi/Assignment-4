@@ -4,16 +4,22 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Libraries\DataParamsStudent;
+use App\Models\EnrollmentModel;
 use App\Models\StudentModel;
+use Myth\Auth\Models\UserModel;
 
 class StudentController extends BaseController
 {
     private StudentModel $studentModel;
+    protected UserModel $userModel;
+    protected EnrollmentModel $enrollmentModel;
     protected $renderer;
 
     public function __construct()
     {
         $this->studentModel = new StudentModel();
+        $this->userModel = new UserModel();
+        $this->enrollmentModel = new EnrollmentModel();
         $this->renderer = service('renderer');
     }
 
@@ -42,7 +48,7 @@ class StudentController extends BaseController
             'academic_statuses' => $this->studentModel->getAllAcademicStatuses(),
             'entry_years' => $this->studentModel->getAllEntryYears(),
             'study_programs' => $this->studentModel->getAllStudyPrograms(),
-            'baseUrl' => base_url('/students'),
+            'baseUrl' => base_url('admin/students'),
             'student_id_th' => view_cell('SortTableHeaderCell', ['params' => $params, 'baseUrl' => base_url('/students'), 'tableField' => 'student_id', 'tableTitleHeader' => 'Student Id']),
             'current_semester_th' => view_cell('SortTableHeaderCell', ['params' => $params, 'baseUrl' => base_url('/students'), 'tableField' => 'current_semester', 'tableTitleHeader' => 'Current Semester'])
         ];
@@ -93,7 +99,8 @@ class StudentController extends BaseController
 
     public function new(): string
     {
-        return view('students/add');
+        $data['users'] = $this->userModel->findAll();
+        return view('students/add', $data);
     }
 
     public function create()
@@ -110,20 +117,21 @@ class StudentController extends BaseController
             'entry_year' => $data['entryYear'],
             'academic_status' => $data['academicStatus'],
             'gpa' => $data['gpa'],
+            'user_id' => $data['user_id']
         ];
 
         // validate data before insert data
 
         if (! $this->studentModel->validate($data)) {
-            return view('students/add', [
-                'errors' => $this->studentModel->errors(),
-            ]);
+            return redirect()->back()
+                ->with('errors', $this->studentModel->errors())
+                ->withInput();
         }
 
         // add data to table
         $this->studentModel->save($data);
 
-        return redirect()->to('students')->with('success', 'Students added successfully');
+        return redirect()->to('admin/students')->with('success', 'Students added successfully');
     }
 
     public function edit($id): string
@@ -157,7 +165,7 @@ class StudentController extends BaseController
         // update student data at table and success
         if ($this->studentModel->save($student)) {
             session()->setFlashdata('success', 'User berhasil diupdate');
-            return redirect()->to('/students');
+            return redirect()->to('admin/students');
         }
 
         // if update fail
@@ -166,11 +174,19 @@ class StudentController extends BaseController
             ->withInput();
     }
 
-
-    public function deleteCourse($id)
+    public function delete($id)
     {
         // delete student data based on id
         $this->studentModel->delete($id);
-        return redirect()->to('students')->with('success', 'Students deleted successfully');
+        return redirect()->to('admin/students')->with('success', 'Students deleted successfully');
+    }
+
+    public function enrollment()
+    {
+        $userId = user_id();
+        $student = $this->studentModel->where('user_id', $userId)->first();
+        $data['enrollments'] = $this->enrollmentModel->getEnrollmentUsers($student->id);
+
+        return view('students/enrollments', $data);
     }
 }

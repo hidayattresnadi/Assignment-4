@@ -16,7 +16,7 @@
             <h4 class="mb-0">Edit Course</h4>
         </div>
         <div class="card-body">
-            <form id="formData" method="post" action="<?= site_url('academics/courses/edit/' . $course->id) ?>">
+            <form id="formData" method="post" action="<?= site_url('lecturer/academics/courses/edit/' . $course->id) ?>">
                 <?= csrf_field() ?>
                 <input type="hidden" name="_method" value="PUT">
                 <div class="mb-3">
@@ -84,7 +84,7 @@
                 return true;
             }
             return false;
-        }, "The code minimal 8 characters", 2, false);
+        }, "The code minimal 5 characters", 2, false);
 
 
         form.addEventListener('submit', function(e) {

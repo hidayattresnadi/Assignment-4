@@ -53,7 +53,7 @@
 </div>
 
 
-<a href="<?= site_url('academics/courses/new') ?>" class="btn btn-success mb-3">Add Course</a>
+<a href="<?= site_url('lecturer/academics/courses/new') ?>" class="btn btn-success mb-3">Add Course</a>
 <?= $content ?? '' ?>
 <?= $pager->links('courses', 'custom_pager') ?>
 <?= $this->endSection() ?>

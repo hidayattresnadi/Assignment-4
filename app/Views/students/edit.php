@@ -16,7 +16,7 @@
             <h4 class="mb-0">Edit Student</h4>
         </div>
         <div class="card-body">
-            <form id="formData" method="post" action="<?= site_url('students/' . $student->id) ?>">
+            <form id="formData" method="post" action="<?= site_url('admin/students/update/' . $student->id) ?>">
                 <?= csrf_field() ?>
                 <input type="hidden" name="_method" value="PUT">
                 <div class="mb-3">

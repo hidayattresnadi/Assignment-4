@@ -7,9 +7,37 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item"><a class="nav-link" href="<?= route_to('students') ?>">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="<?= site_url('students/1') ?>">Profile</a></li>
+                <?php if ((in_groups('student'))) : ?>
+                    <li class="nav-item"><a class="nav-link" href="<?= site_url('/student/profile/' . user_id()) ?>">Profile</a></li>
+                <?php endif; ?>
+                <?php if ((in_groups('student'))) : ?>
+                    <li class="nav-item"><a class="nav-link" href="<?= site_url('/student/enrollment') ?>">Enrollments</a></li>
+                <?php endif; ?>
+                <?php if ((in_groups('lecturer'))) : ?>
+                    <li class="nav-item"><a class="nav-link" href="<?= route_to('academics_courses') ?>">Courses</a></li>
+                <?php endif; ?>
+                <?php if (logged_in()) : ?>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                            href="<?= site_url(in_groups('admin') ? 'admin/dashboard' : (in_groups('lecturer') ? 'lecturer/dashboard' : 'student/dashboard')) ?>">
+                            Dashboard
+                        </a>
+                    </li>
+                <?php endif; ?>
+
+
             </ul>
-            <span class="navbar-text">Welcome, John Doe</span>
+            <?php if (logged_in()) : ?>
+                <span class="navbar-text">Welcome, <?= user()->username; ?></span>
+            <?php endif; ?>
+
         </div>
+        <li>
+            <?php if (logged_in()) : ?>
+                <a class="navbar-text text-decoration-none" href="/logout">Logout</a>
+            <?php else : ?>
+                <a class="navbar-text text-decoration-none" href="/login">Login</a>
+            <?php endif; ?>
+        </li>
     </div>
 </nav>

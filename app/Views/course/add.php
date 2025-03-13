@@ -17,7 +17,7 @@
             <h4 class="mb-0">Add Course</h4>
         </div>
         <div class="card-body">
-            <form id="formData" method="post" action="<?= site_url('/academics/courses') ?>">
+            <form id="formData" method="post" action="<?= site_url('lecturer/academics/courses') ?>">
                 <div class="mb-3">
                     <label for="name" class="form-label">Name</label>
                     <input type="text" id="name" name="name" class="form-control" placeholder="Enter Name"
@@ -82,7 +82,7 @@
                 return true;
             }
             return false;
-        }, "The code minimal 8 characters", 2, false);
+        }, "The code minimal 5 characters", 2, false);
 
 
         form.addEventListener('submit', function(e) {

@@ -30,10 +30,9 @@ class CourseController extends BaseController
             ],
         ];
         $this->renderer->setData($data);
-        $cacheKey = 'view_' . str_replace('/', '_', $this->request->getUri()->getPath());
-        return cache()->remember($cacheKey, 3600, function () {
-            return $this->renderer->render('course/index');
-        });
+        return $this->renderer->render('course/index');
+        // $cacheKey = 'view_' . str_replace('/', '_', $this->request->getUri()->getPath());
+        // return cache()->remember($cacheKey, 3600, function () {});
     }
 
     public function showCourses()
@@ -60,7 +59,7 @@ class CourseController extends BaseController
             'params' => $params,
             'credits' => $this->courseModel->getAllCredits(),
             'semesters' => $this->courseModel->getAllSemesters(),
-            'baseUrl' => base_url('/academics/courses')
+            'baseUrl' => base_url('lecturer/academics/courses')
         ];
 
 

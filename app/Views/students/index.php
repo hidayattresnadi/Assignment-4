@@ -16,7 +16,7 @@
 
             <!-- Filter by Academic Status -->
             <div class="col-md-2 ms-md-5">
-                <label class="form-label mb-1">Filter by Academic Status</label>
+                <label class="form-label mb-1">Filter by Status</label>
                 <select name="academic_status" class="form-control" onchange="this.form.submit()">
                     <option value="">All Academic Statuses</option>
                     <?php foreach ($academic_statuses as $status): ?>
@@ -67,7 +67,7 @@
 </div>
 
 
-<a href=<?= base_url('/students') ?> class="btn btn-success mb-3">Add Student</a>
+<a href=<?= base_url('admin/students/create') ?> class="btn btn-success mb-3">Add Student</a>
 <?= $content ?? '' ?>
 <?= $pager->links('students', 'custom_pager') ?>
 

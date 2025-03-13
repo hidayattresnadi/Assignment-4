@@ -91,9 +91,12 @@
     </div>
 
     <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <?= $this->include('partials/sidebar') ?>
-    </div>
+    <?php if ((in_groups('admin'))) : ?>
+        <div class="sidebar" id="sidebar">
+            <?= $this->include('partials/sidebar') ?>
+        </div>
+    <?php endif; ?>
+
 
     <script>
         document.getElementById("toggleSidebar").addEventListener("click", function(event) {

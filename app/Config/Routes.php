@@ -6,12 +6,63 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 $routes->get('/', 'Home::index');
-$routes->resource('students', ['controller' => 'StudentController']);
 $routes->get('/academics', 'CourseController::index');
-$routes->get('/academics/courses', 'CourseController::showCourses', ['as' => 'academics_courses']);
-$routes->get('/academics/courses/(:num)', 'CourseController::courseDetail/$1');
-$routes->delete('/academics/courses/(:num)', 'CourseController::delete/$1');
-$routes->get('/academics/courses/new', 'CourseController::new');
-$routes->post('/academics/courses', 'CourseController::create');
-$routes->get('/academics/courses/edit/(:num)', 'CourseController::edit/$1');
-$routes->put('/academics/courses/edit/(:num)', 'CourseController::update/$1');
+$routes->get('unauthorized', 'Home::unauthorized');
+
+$routes->group('', ['namespace' => 'App\Controllers'], function ($routes) {
+    // Route lain seperti login, dll
+    $routes->get('login', 'Auth::login', ['as' => 'login']);
+    $routes->post('login', 'Auth::attemptLogin');
+});
+
+
+// Routes yang hanya bisa diakses lecturer
+$routes->group('lecturer', ['filter' => 'role:lecturer'], function ($routes) {
+    $routes->get('dashboard', 'DashboardController::lecturerDashboard');
+    $routes->get('academics/courses', 'CourseController::showCourses', ['as' => 'academics_courses']);
+    $routes->get('academics/courses/(:num)', 'CourseController::courseDetail/$1');
+    $routes->delete('academics/courses/(:num)', 'CourseController::delete/$1');
+    $routes->get('academics/courses/new', 'CourseController::new');
+    $routes->post('academics/courses', 'CourseController::create');
+    $routes->get('academics/courses/edit/(:num)', 'CourseController::edit/$1');
+    $routes->put('academics/courses/edit/(:num)', 'CourseController::update/$1');
+});
+
+// Routes yang hanya bisa diakses student
+$routes->group('student', ['filter' => 'role:student'], function ($routes) {
+    $routes->get('dashboard', 'DashboardController::studentDashboard');
+    $routes->get('enrollment', 'StudentController::enrollment');
+    $routes->get('profile/(:num)', 'StudentController::show/$1');
+});
+
+// Routes yang bisa diakses oleh lecturer dan admin
+// $routes->group('', ['filter' => 'role:admin,lecturer'], function ($routes) {
+//     $routes->get('reports', 'Report::index');
+//     $routes->get('generate-report', 'Report::generate');
+// });
+
+// Route unauthorized
+
+$routes->get('/addUserToGroupForm', 'Auth::addUserToGroupForm');
+$routes->post('/addUserToGroup', 'Auth::addUserToGroup');
+
+
+$routes->group('admin/users', ['filter' => 'role:admin'], function ($routes) {
+    $routes->get('/', 'UserController::index', ['as' => 'users']);
+    $routes->get('edit/(:num)', 'UserController::edit/$1');
+    $routes->put('update/(:num)', 'UserController::update/$1');
+    $routes->delete('delete/(:num)', 'UserController::delete/$1');
+    $routes->get('register', 'UserController::create');
+    $routes->post('store', 'UserController::store');
+});
+
+$routes->group('admin/students', ['filter' => 'role:admin'], function ($routes) {
+    $routes->get('/', 'StudentController::index', ['as' => 'students']);
+    $routes->get('create', 'StudentController::new');
+    $routes->post('store', 'StudentController::create');
+    $routes->get('edit/(:num)', 'StudentController::edit/$1');
+    $routes->put('update/(:num)', 'StudentController::update/$1');
+    $routes->delete('delete/(:num)', 'StudentController::delete/$1');
+});
+
+$routes->get('admin/dashboard', 'DashboardController::adminDashboard', ['filter' => 'role:admin']);

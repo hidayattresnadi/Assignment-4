@@ -8,4 +8,9 @@ class Home extends BaseController
     {
         return redirect()->to(route_to('academics'));
     }
+
+    public function unauthorized()
+    {
+        return view('errors/error403');
+    }
 }

@@ -14,8 +14,8 @@
             <p><strong>Semester:</strong> <?= esc($semester) ?></p>
         </div>
         <div class="card-footer">
-            <a href="/academics/courses" class="btn btn-secondary">Back</a>
-            <a href="/academics/courses/edit/<?= $id ?>" class="btn btn-warning">Edit</a>
+            <a href="<?= site_url('lecturer/academics/courses') ?>" class="btn btn-secondary">Back</a>
+            <a href="<?= site_url('lecturer/academics/courses/edit/' . $id) ?>" class="btn btn-warning">Edit</a>
         </div>
     </div>
 </div>
