@@ -15,6 +15,7 @@ class Student extends Entity
         'academic_status' => null,
         'entry_year' => null,
         'gpa' => null,
+        'diploma_file' => null,
         'created_at' => null,
         'updated_at' => null,
     ];

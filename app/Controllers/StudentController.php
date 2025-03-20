@@ -4,8 +4,11 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Libraries\DataParamsStudent;
+use App\Models\CourseModel;
 use App\Models\EnrollmentModel;
 use App\Models\StudentModel;
+use CodeIgniter\Files\File;
+use CodeIgniter\I18n\Time;
 use Myth\Auth\Models\UserModel;
 
 class StudentController extends BaseController
@@ -14,6 +17,7 @@ class StudentController extends BaseController
     protected UserModel $userModel;
     protected EnrollmentModel $enrollmentModel;
     protected $renderer;
+    protected CourseModel $courseModel;
 
     public function __construct()
     {
@@ -21,6 +25,7 @@ class StudentController extends BaseController
         $this->userModel = new UserModel();
         $this->enrollmentModel = new EnrollmentModel();
         $this->renderer = service('renderer');
+        $this->courseModel = new CourseModel();
     }
 
     public function index()
@@ -188,5 +193,244 @@ class StudentController extends BaseController
         $data['enrollments'] = $this->enrollmentModel->getEnrollmentUsers($student->id);
 
         return view('students/enrollments', $data);
+    }
+
+    public function sendEmail()
+    {
+        $email = service('email');
+        $email->setFrom('your@example.com', 'Your Name');
+        $email->setTo('dayat@yopmail.com');
+        $imagePath = ROOTPATH . 'public/uploads/gambar.png';
+
+        // $email->setSubject('Email Test');
+
+        // $email->setMessage('Testing the email class.');
+
+        $email->setSubject('Email Test dengan Template HTML');
+
+        $data = [
+            'title' => 'Pemberitahuan Penting',
+            'name' => 'John Doe',
+            'content' => 'Ini adalah isi email yang akan dikirimkan.',
+            'features' => [
+                'Fitur 1: Informasi penting',
+                'Fitur 2: Detail produk',
+                'Fitur 3: Cara penggunaan'
+            ]
+        ];
+
+        $message = view('email/testEmail', $data); // Isi konten email
+        $email->setMessage($message);
+
+        if (file_exists($imagePath)) {
+            $email->attach($imagePath);
+        }
+
+        $ccList = [
+            'dayat24@yopmail.com',
+            'dayat25@yopmail.com'
+        ];
+
+        $email->setCC($ccList);
+
+        if ($email->send()) {
+            return redirect()->to('admin/students')->with('success', 'Email berhasil dikirim');
+        } else {
+            $data = ['error' => $email->printDebugger()];
+            return view('email_form', $data);
+        }
+    }
+
+    public function upload()
+    {
+        helper('form');
+        $userfile = $this->request->getFile('userfile');
+
+        $validationRules = [
+            'userfile' => [
+                'label' => 'Gambar',
+                'rules' => [
+                    'uploaded[userfile]',
+                    'is_image[userfile]',
+                    'mime_in[userfile,image/jpg,image/jpeg,image/png,image/gif]',
+                    'max_size[userfile,3*1024]', // 5MB dalam KB (5 * 1024)
+                ],
+                'errors' => [
+                    'uploaded' => 'Silakan pilih file gambar untuk diunggah',
+                    'is_image' => 'File harus berupa gambar',
+                    'mime_in' => 'File harus berformat JPG, JPEG, PNG, atau GIF',
+                    'max_size' => 'Ukuran file tidak boleh melebihi 1MB'
+                ]
+            ]
+        ];
+
+        if (!$this->validate($validationRules)) {
+            return redirect()->back()
+                ->with('errors', $this->validator->getErrors());
+        }
+
+
+        // klo mau dapetin make nama file asli
+        // $fileName = $userfile->getName();
+
+        // kalau mau nyimpen make nama random
+        $newName = $userfile->getRandomName();
+        $userfile->move(WRITEPATH . 'uploads', $newName);
+        $filepath = WRITEPATH . 'uploads/' . $newName;
+
+        $this->createImageVersions($filepath, $newName);
+
+        $data = ['uploaded_fileinfo' => new File($filepath)];
+        $data['baseUrl'] = 'upload';
+        return view('upload_success', $data);
+    }
+
+    public function uploadForm()
+    {
+        helper('form');
+        return view('uploadForm');
+    }
+
+    private function createImageVersions($filePath, $fileName)
+    {
+        $image = service('image');
+
+
+        $image->withFile($filePath)
+            ->fit(100, 100, 'center')
+            ->save(WRITEPATH . 'uploads/thumbnail/' . $fileName);
+
+
+        // $image->withFile($filePath)
+        //     ->fit(300, 300, 'center')
+        //     ->save(WRITEPATH . 'uploads/medium/' . $fileName);
+
+        // Jika ingin menggunakan resize (mempertahankan ratio) daripada fit:
+        $image->withFile($filePath)
+            ->resize(300, 300, true, 'height')
+            ->save(WRITEPATH . 'uploads/medium/' . $fileName);
+
+        $image->withFile($filePath)
+            ->text('Copyright 2017 My Photo Co', [
+                'color'      => '#fff',
+                'opacity'    => 0.5,
+                'withShadow' => true,
+                'hAlign'     => 'center',
+                'vAlign'     => 'bottom',
+                'fontSize'   => 20,
+            ])
+            ->save(WRITEPATH . 'uploads/watermark/' . $fileName);
+    }
+
+    public function uploadDiplomaForm()
+    {
+        helper('form');
+        return view('students/upload_diploma_file');
+    }
+
+    public function uploadDiplomaFile()
+    {
+        helper('form');
+        $userfile = $this->request->getFile('userfile');
+
+        $validationRules = [
+            'userfile' => [
+                'label' => 'Document',
+                'rules' => [
+                    'uploaded[userfile]',
+                    'mime_in[userfile,application/pdf]',
+                    'max_size[userfile,5*1024]', // 5MB dalam KB (5 * 1024)
+                ],
+                'errors' => [
+                    'uploaded' => 'Please choose file to upload',
+                    'mime_in' => 'File should be onlu in pdf format',
+                    'max_size' => 'File size is not allowed for more than 5 MB'
+                ]
+            ]
+        ];
+
+
+        if (!$this->validate($validationRules)) {
+            return redirect()->back()
+                ->with('errors', $this->validator->getErrors());
+        }
+
+        $userId = user_id();
+        $student = $this->studentModel->where('user_id', $userId)->first();
+        $studentId = $student ? $student->student_id : null;
+        $studentName = $student ? $student->name : null;
+        $timestamp = date("Ymd_His"); // Format: TahunBulanHari_JamMenitDetik
+        $extension = pathinfo($userfile->getClientName(), PATHINFO_EXTENSION); // Ambil ekstensi file asli
+
+        $newName = $studentId . "_" . $timestamp . "." . $extension;
+        $uploadPath = WRITEPATH . 'uploads/' . $studentName;
+        // Cek apakah folder sudah ada, jika belum buat folder
+        if (!is_dir($uploadPath)) {
+            mkdir($uploadPath, 0777, true); // Buat folder dengan izin penuh
+        }
+
+        $userfile->move($uploadPath, $newName);
+        $filepath = $uploadPath . '/' . $newName;
+
+        $data = ['uploaded_fileinfo' => new File($filepath)];
+        $data['baseUrl'] = 'student/upload/diploma_file_form';
+
+        $student->diploma_file = $filepath;
+        $this->studentModel->save($student);
+
+        return view('upload_success', $data);
+    }
+
+
+    public function courseRegistrationForm()
+    {
+        $data['courses'] = $this->courseModel->findAll();
+        return view('students/course_registration', $data);
+    }
+
+    public function courseRegistration()
+    {
+        $data = $this->request->getPost();
+        $userId = user_id();
+        $student = $this->studentModel->where('user_id', $userId)->first();
+        $user = $this->userModel->find($userId);
+        $courseId = $data['course_id'];
+        $course = $this->courseModel->find(+$courseId);
+
+        $email = service('email');
+        $email->setFrom('rain@university.com', 'Rain university');
+        $email->setTo($user->email);
+
+        $email->setSubject('Course Registration');
+
+        $time = Time::now('Asia/Jakarta');
+        $formattedDate = $time->toLocalizedString('EEEE, dd MMMM yyyy'); // Format tanggal
+        $formattedTime = $time->toLocalizedString('HH:mm:ss'); // Format jam & menit
+
+        $data = [
+            'student_id' => $student->id,
+            'student_university_id' => $student->student_id,
+            'name' => $student->name,
+            'course_name' => $course->name,
+            'course_code' => $course->code,
+            'course_id' => $course->id,
+            'academic_year' => date('Y'),
+            'semester' => $student->current_semester,
+            'course_credits' => $course->credits,
+            'registration_date' => $formattedDate,
+            'registration_time' => $formattedTime,
+        ];
+
+        $this->enrollmentModel->save($data);
+
+        $message = view('email/course_registration', $data);
+        $email->setMessage($message);
+
+        if ($email->send()) {
+            return redirect()->to('student/enrollment')->with('success', 'Email sended successfully');
+        } else {
+            $data = ['error' => $email->printDebugger()];
+            return view('students/course_registration', $data);
+        }
     }
 }

@@ -6,12 +6,14 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link" href="<?= route_to('students') ?>">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= route_to('/') ?>">Home</a></li>
                 <?php if ((in_groups('student'))) : ?>
                     <li class="nav-item"><a class="nav-link" href="<?= site_url('/student/profile/' . user_id()) ?>">Profile</a></li>
                 <?php endif; ?>
                 <?php if ((in_groups('student'))) : ?>
                     <li class="nav-item"><a class="nav-link" href="<?= site_url('/student/enrollment') ?>">Enrollments</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= site_url('student/upload/diploma_file_form') ?>">Upload File</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= site_url('student/course_registration') ?>">Course Registration</a></li>
                 <?php endif; ?>
                 <?php if ((in_groups('lecturer'))) : ?>
                     <li class="nav-item"><a class="nav-link" href="<?= route_to('academics_courses') ?>">Courses</a></li>

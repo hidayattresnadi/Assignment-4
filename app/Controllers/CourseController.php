@@ -52,7 +52,7 @@ class CourseController extends BaseController
 
 
         $data = [
-            'title' => 'Manajemen Users',
+            'title' => 'List Courses',
             'courses' => $result['courses'],
             'pager' => $result['pager'],
             'total' => $result['total'],
@@ -78,6 +78,7 @@ class CourseController extends BaseController
 
     public function courseDetail($id)
     {
+
         // show course data based on id
         $courseData = $this->courseModel->find($id);
         $data = [

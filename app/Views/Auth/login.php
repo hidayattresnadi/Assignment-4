@@ -58,6 +58,10 @@
                     </form>
 
                     <div class="text-center mt-3">
+                        <a href="<?= route_to('register') ?>">Not have an account?</a>
+                    </div>
+
+                    <div class="text-center mt-3">
                         <a href="<?= route_to('forgot') ?>">Forgot Password?</a>
                     </div>
                 </div>

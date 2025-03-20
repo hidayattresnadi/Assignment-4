@@ -13,7 +13,7 @@ class EnrollmentModel extends Model
     protected $returnType       = \App\Entities\Enrollment::class;
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields    = ['course_id', 'student_id', 'academic_year', 'semester', 'status'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -22,9 +22,10 @@ class EnrollmentModel extends Model
     protected array $castHandlers = [];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
 
     // Validation
     protected $validationRules      = [];

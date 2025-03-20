@@ -13,7 +13,7 @@ class StudentModel extends Model
     protected $returnType       = \App\Entities\Student::class;
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields  = ['student_id', 'name', 'study_program', 'current_semester', 'entry_year', 'academic_status', 'gpa'];
+    protected $allowedFields  = ['student_id', 'name', 'study_program', 'current_semester', 'entry_year', 'academic_status', 'gpa', 'diploma_file'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

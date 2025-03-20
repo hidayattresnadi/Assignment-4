@@ -72,18 +72,16 @@ class Auth extends AuthController
     {
         $response = parent::attemptRegister();
 
-        // Jika parent sudah melakukan redirect, langsung return
-        if ($response instanceof RedirectResponse) {
+        $email = $this->request->getPost('email');
+        $user = $this->userModel->where('email', $email)->first();
+
+        if ($user == null) {
             return $response;
         }
 
-        $email = $this->request->getPost('email');
-        $role = $this->request->getPost('role');
-        $user = $this->userModel->where('email', $email)->first();
-
         if ($user) {
             // Tambahkan ke group role sesuai yang dipilih
-            $userRoleGroup = $this->groupModel->where('name', $role)->first();
+            $userRoleGroup = $this->groupModel->where('name', 'student')->first();
             if ($userRoleGroup) {
                 $this->groupModel->addUserToGroup($user->id, $userRoleGroup->id);
             }

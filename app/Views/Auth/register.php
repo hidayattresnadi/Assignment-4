@@ -56,17 +56,6 @@
                             <?php endif; ?>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="role" class="form-label">Select Role</label>
-                            <select id="role" name="role" class="form-select"
-                                required>
-                                <option value="" disabled selected>-- Select Role --</option>
-                                <option value="admin">Admin</option>
-                                <option value="lecturer">Lecturer</option>
-                                <option value="student">Student</option>
-                            </select>
-                        </div>
-
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary">Daftar</button>
                         </div>

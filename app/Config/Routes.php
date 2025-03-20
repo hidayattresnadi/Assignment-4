@@ -13,6 +13,8 @@ $routes->group('', ['namespace' => 'App\Controllers'], function ($routes) {
     // Route lain seperti login, dll
     $routes->get('login', 'Auth::login', ['as' => 'login']);
     $routes->post('login', 'Auth::attemptLogin');
+    $routes->get('register', 'Auth::register', ['as' => 'register']);
+    $routes->post('register', 'Auth::attemptRegister');
 });
 
 
@@ -33,6 +35,10 @@ $routes->group('student', ['filter' => 'role:student'], function ($routes) {
     $routes->get('dashboard', 'DashboardController::studentDashboard');
     $routes->get('enrollment', 'StudentController::enrollment');
     $routes->get('profile/(:num)', 'StudentController::show/$1');
+    $routes->get('upload/diploma_file_form', 'StudentController::uploadDiplomaForm');
+    $routes->post('upload/diploma_file', 'StudentController::uploadDiplomaFile');
+    $routes->get('course_registration', 'StudentController::courseRegistrationForm');
+    $routes->post('course_registration', 'StudentController::courseRegistration');
 });
 
 // Routes yang bisa diakses oleh lecturer dan admin
@@ -66,3 +72,7 @@ $routes->group('admin/students', ['filter' => 'role:admin'], function ($routes) 
 });
 
 $routes->get('admin/dashboard', 'DashboardController::adminDashboard', ['filter' => 'role:admin']);
+
+$routes->get('sendEmail', 'StudentController::sendEmail');
+$routes->get('upload', 'StudentController::uploadForm');
+$routes->post('upload', 'StudentController::upload');
