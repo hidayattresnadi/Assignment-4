@@ -32,7 +32,7 @@ $routes->group('lecturer', ['filter' => 'role:lecturer'], function ($routes) {
 
 // Routes yang hanya bisa diakses student
 $routes->group('student', ['filter' => 'role:student'], function ($routes) {
-    $routes->get('dashboard', 'DashboardController::studentDashboard');
+    $routes->get('dashboard', 'DashboardController::index');
     $routes->get('enrollment', 'StudentController::enrollment');
     $routes->get('profile/(:num)', 'StudentController::show/$1');
     $routes->get('upload/diploma_file_form', 'StudentController::uploadDiplomaForm');
@@ -42,10 +42,12 @@ $routes->group('student', ['filter' => 'role:student'], function ($routes) {
 });
 
 // Routes yang bisa diakses oleh lecturer dan admin
-// $routes->group('', ['filter' => 'role:admin,lecturer'], function ($routes) {
-//     $routes->get('reports', 'Report::index');
-//     $routes->get('generate-report', 'Report::generate');
-// });
+$routes->group('', ['filter' => 'role:admin,lecturer'], function ($routes) {
+    $routes->get('report/enrollment', 'ReportController::enrollmentForm');
+    $routes->get('report/enrollmentExcel', 'ReportController::enrollmentExcel');
+    $routes->get('report_students', 'ReportController::studentsbyprogramForm');
+    $routes->post('report/studentsbyprogram', 'ReportController::studentsbyprogramPdf');
+});
 
 // Route unauthorized
 
@@ -76,8 +78,3 @@ $routes->get('admin/dashboard', 'DashboardController::adminDashboard', ['filter'
 $routes->get('sendEmail', 'StudentController::sendEmail');
 $routes->get('upload', 'StudentController::uploadForm');
 $routes->post('upload', 'StudentController::upload');
-$routes->get('dashboard', 'DashboardController::index');
-$routes->get('report/enrollment', 'ReportController::enrollmentForm');
-$routes->get('report/enrollmentExcel', 'ReportController::enrollmentExcel');
-$routes->get('report_students', 'ReportController::studentsbyprogramForm');
-$routes->post('report/studentsbyprogram', 'ReportController::studentsbyprogramPdf');
