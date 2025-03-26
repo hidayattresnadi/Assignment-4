@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Libraries\CustomTCPDF;
 use App\Models\EnrollmentModel;
 use App\Models\StudentModel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -239,20 +240,22 @@ class ReportController extends BaseController
 
     private function initTcpdf()
     {
-        $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
+        $pdf = new CustomTCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
 
         $pdf->SetCreator('CodeIgniter 4');
         $pdf->SetAuthor('Administrator');
         $pdf->SetTitle('Laporan Mahasiswa');
         $pdf->SetSubject('Laporan Data Mahasiswa');
 
-        $pdf->SetHeaderData('', 0, 'RAIN UNIVERSITY', '', [0, 0, 0], [0, 64, 128]);
-        $pdf->setFooterData([0, 64, 0], [0, 64, 128]);
+        $pdf->SetPrintHeader(true);
+        $pdf->SetPrintFooter(true);
+        // $pdf->setHeaderData(WRITEPATH . 'uploads/columbia_university.png', 20, 'Laporan Mahasiswa');
 
-        $pdf->setHeaderFont(['helvetica', '', 12]);
-        $pdf->setFooterFont(['helvetica', '', 8]);
+        // $pdf->setHeaderFont(['helvetica', '', 12]);
+        // $pdf->setFooterFont(['helvetica', '', 8]);
 
-        $pdf->SetMargins(15, 20, 15);
+        $pdf->SetMargins(15, 55, 15); // Geser konten ke bawah (margin atas 90mm)
+
         $pdf->SetHeaderMargin(5);
         $pdf->SetFooterMargin(10);
 
@@ -292,6 +295,9 @@ class ReportController extends BaseController
 
         // $this->generatePdfContent($pdf, $studentsData, $studyProgram, $entryYear);
         $this->generatePdfHtmlContent($pdf, $studentsData, $studyProgram, $entryYear);
+        // $pdf->Image(WRITEPATH . 'uploads/1742273141_6112c961c11224cdafaf.png', 25, 10, 10, 10, 'PNG', '', '', true);
+
+
 
         // Output PDF
         $filename = 'laporan_mahasiswa_' . date('Y-m-d') . '.pdf';
