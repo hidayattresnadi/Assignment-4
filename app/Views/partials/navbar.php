@@ -17,6 +17,8 @@
                 <?php endif; ?>
                 <?php if ((in_groups('lecturer'))) : ?>
                     <li class="nav-item"><a class="nav-link" href="<?= route_to('academics_courses') ?>">Courses</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= route_to('report/enrollment') ?>">Enrollment Report</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="<?= route_to('report_students') ?>">List Students Report</a></li>
                 <?php endif; ?>
                 <?php if (logged_in()) : ?>
                     <li class="nav-item">

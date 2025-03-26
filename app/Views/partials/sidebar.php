@@ -3,4 +3,6 @@
     <li class="nav-item"><a class="nav-link text-white" href="<?= route_to('academics') ?>">Academic Statistic</a></li>
     <li class="nav-item"><a class="nav-link text-white" href="<?= route_to('students') ?>">Students</a></li>
     <li class="nav-item"><a class="nav-link text-white" href="<?= route_to('users') ?>">Users</a></li>
+    <li class="nav-item"><a class="nav-link text-white" href="<?= route_to('report/enrollment') ?>">Enrollment Report</a></li>
+    <li class="nav-item"><a class="nav-link text-white" href="<?= route_to('report_students') ?>">List Students Report</a></li>
 </ul>
