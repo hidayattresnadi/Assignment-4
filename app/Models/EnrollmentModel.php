@@ -57,4 +57,43 @@ class EnrollmentModel extends Model
     {
         return $this->where('student_id', $studentId)->countAllResults();
     }
+
+
+    public function getCreditComparison($studentId)
+    {
+        return $this->select('students.id as student_id, enrollments.semester as semester, sum(courses.credits) as credits_taken')
+            ->join('academic.students', 'academic.students.id = academic.enrollments.student_id')
+            ->join('academic.courses', 'academic.courses.id = academic.enrollments.course_id')
+            ->where('enrollments.student_id', $studentId)
+            ->groupBy('academic.enrollments.semester')
+            ->findAll();
+    }
+
+    public function getEnrollmentAllUsers($search, $filter_by)
+    {
+        if (!empty($filter_by)) {
+            if (!empty($search)) {
+                $this->groupStart()
+                    ->like('academic.students.' . $filter_by, $search)
+                    ->groupEnd();
+            }
+        }
+
+        return $this
+            ->select('
+            academic.students.name as student_name, 
+            academic.students.study_program, 
+            academic.students.student_id as student_university_id,
+            academic.students.current_semester,
+            academic.courses.code as course_code,
+            academic.courses.name as course_name,
+            academic.courses.credits,
+            enrollments.academic_year,
+            enrollments.status,
+            enrollments.semester as enrollment_semester
+            ')
+            ->join('academic.students', 'academic.students.id = enrollments.student_id')
+            ->join('academic.courses', 'academic.courses.id = enrollments.course_id')
+            ->findAll();
+    }
 }

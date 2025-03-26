@@ -76,3 +76,8 @@ $routes->get('admin/dashboard', 'DashboardController::adminDashboard', ['filter'
 $routes->get('sendEmail', 'StudentController::sendEmail');
 $routes->get('upload', 'StudentController::uploadForm');
 $routes->post('upload', 'StudentController::upload');
+$routes->get('dashboard', 'DashboardController::index');
+$routes->get('report/enrollment', 'ReportController::enrollmentForm');
+$routes->get('report/enrollmentExcel', 'ReportController::enrollmentExcel');
+$routes->get('report_students', 'ReportController::studentsbyprogramForm');
+$routes->post('report/studentsbyprogram', 'ReportController::studentsbyprogramPdf');

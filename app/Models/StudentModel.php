@@ -157,4 +157,19 @@ class StudentModel extends Model
         $study_programs = $this->select('study_program')->distinct()->findAll();
         return array_column($study_programs, 'study_program');
     }
+
+    public function getReportStudents($studyProgram, $entry_year)
+    {
+        if (!empty($studyProgram)) {
+            $this->where('study_program', $studyProgram);
+        }
+
+        // Apply filter entry year
+
+        if (!empty($entry_year)) {
+            $this->where('entry_year', $entry_year);
+        }
+
+        return $this->findAll();
+    }
 }
